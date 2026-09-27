@@ -1,10 +1,11 @@
 {
+  "category": "quality",
+  "description": "Quality profile",
   "id": "quality",
-  "version": 1,
-  "status": "advisory",
-  "description": "quality",
   "settings": {
     "crf": 18,
     "encoder_preset": "medium"
-  }
+  },
+  "status": "advisory",
+  "version": 1
 }

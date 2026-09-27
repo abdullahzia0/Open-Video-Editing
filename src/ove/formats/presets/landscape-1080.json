@@ -1,11 +1,12 @@
 {
-  "id": "landscape-1080",
-  "version": 1,
-  "status": "advisory",
+  "category": "resolution",
   "description": "landscape 1080",
+  "id": "landscape-1080",
   "settings": {
-    "width": 1920,
+    "fit": "pad",
     "height": 1080,
-    "fit": "pad"
-  }
+    "width": 1920
+  },
+  "status": "advisory",
+  "version": 1
 }

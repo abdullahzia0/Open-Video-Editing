@@ -1,14 +1,15 @@
 {
-  "id": "instagram-post",
-  "version": 1,
-  "status": "advisory",
+  "category": "platform",
   "description": "instagram post",
+  "id": "instagram-post",
   "settings": {
-    "width": 1080,
-    "height": 1080,
-    "fit": "pad",
+    "audio": "aac",
     "container": "mp4",
+    "fit": "pad",
+    "height": 1080,
     "video_codec": "h264",
-    "audio": "aac"
-  }
+    "width": 1080
+  },
+  "status": "advisory",
+  "version": 1
 }

@@ -1,6 +1,4 @@
 .venv/
-.env
-.env.*
 !.env.example
 __pycache__/
 *.py[cod]
@@ -13,3 +11,5 @@ dist/
 *.egg-info/
 .ove/
 .tools/
+config.bat
+node_modules
