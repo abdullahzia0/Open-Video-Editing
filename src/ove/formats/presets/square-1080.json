@@ -1,0 +1,11 @@
+{
+  "id": "square-1080",
+  "version": 1,
+  "status": "advisory",
+  "description": "square 1080",
+  "settings": {
+    "width": 1080,
+    "height": 1080,
+    "fit": "pad"
+  }
+}

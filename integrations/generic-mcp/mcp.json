@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "open-video-editing": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/ABSOLUTE/PATH/TO/REPOSITORY",
+        "run",
+        "--locked",
+        "ove",
+        "serve"
+      ]
+    }
+  }
+}

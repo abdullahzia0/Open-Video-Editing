@@ -1,0 +1,11 @@
+{
+  "id": "portrait-1080",
+  "version": 1,
+  "status": "advisory",
+  "description": "portrait 1080",
+  "settings": {
+    "width": 1080,
+    "height": 1920,
+    "fit": "pad"
+  }
+}

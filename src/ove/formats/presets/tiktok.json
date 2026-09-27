@@ -1,0 +1,14 @@
+{
+  "id": "tiktok",
+  "version": 1,
+  "status": "advisory",
+  "description": "tiktok",
+  "settings": {
+    "width": 1080,
+    "height": 1920,
+    "fit": "pad",
+    "container": "mp4",
+    "video_codec": "h264",
+    "audio": "aac"
+  }
+}

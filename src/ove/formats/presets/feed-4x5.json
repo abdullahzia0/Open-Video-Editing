@@ -1,0 +1,11 @@
+{
+  "id": "feed-4x5",
+  "version": 1,
+  "status": "advisory",
+  "description": "feed 4x5",
+  "settings": {
+    "width": 1080,
+    "height": 1350,
+    "fit": "pad"
+  }
+}

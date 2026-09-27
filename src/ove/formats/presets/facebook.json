@@ -1,0 +1,14 @@
+{
+  "id": "facebook",
+  "version": 1,
+  "status": "advisory",
+  "description": "facebook",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "fit": "pad",
+    "container": "mp4",
+    "video_codec": "h264",
+    "audio": "aac"
+  }
+}

@@ -1,0 +1,20 @@
+services:
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/docker/Dockerfile
+    command: ["worker"]
+    user: "10001:10001"
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: 2g
+    cpus: 2
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=268435456
+    volumes:
+      - ${OVE_HOST_DATA_DIR:?Set OVE_HOST_DATA_DIR}:/data
+      - ${OVE_HOST_MEDIA_DIR:?Set OVE_HOST_MEDIA_DIR}:/media:ro
+    restart: unless-stopped

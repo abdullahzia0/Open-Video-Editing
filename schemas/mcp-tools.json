@@ -1,0 +1,1171 @@
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Inspect installed engines, supported operations and unavailable providers.",
+    "inputSchema": {
+      "properties": {},
+      "title": "system_capabilitiesArguments",
+      "type": "object"
+    },
+    "name": "system_capabilities"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Copy and inspect a local file under configured roots. URLs are not supported.",
+    "inputSchema": {
+      "properties": {
+        "source": {
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "assets_importArguments",
+      "type": "object"
+    },
+    "name": "assets_import"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Read registered media metadata without changing the source.",
+    "inputSchema": {
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id"
+      ],
+      "title": "assets_inspectArguments",
+      "type": "object"
+    },
+    "name": "assets_inspect"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Create a project referencing previously imported assets.",
+    "inputSchema": {
+      "properties": {
+        "asset_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Ids",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "asset_ids"
+      ],
+      "title": "projects_createArguments",
+      "type": "object"
+    },
+    "name": "projects_create"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Read the current project or an immutable historical revision.",
+    "inputSchema": {
+      "properties": {
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision"
+        }
+      },
+      "required": [
+        "project_id"
+      ],
+      "title": "projects_getArguments",
+      "type": "object"
+    },
+    "name": "projects_get"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Create a revision of project asset membership with optimistic concurrency.",
+    "inputSchema": {
+      "properties": {
+        "asset_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Ids",
+          "type": "array"
+        },
+        "expected_revision": {
+          "title": "Expected Revision",
+          "type": "integer"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "expected_revision",
+        "asset_ids"
+      ],
+      "title": "projects_reviseArguments",
+      "type": "object"
+    },
+    "name": "projects_revise"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "List installed data presets; platform labels are advisory, not upload guarantees.",
+    "inputSchema": {
+      "properties": {},
+      "title": "formats_listArguments",
+      "type": "object"
+    },
+    "name": "formats_list"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Compose preset fragments; conflicting values need an explicit override.",
+    "inputSchema": {
+      "properties": {
+        "overrides": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Overrides"
+        },
+        "preset_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Preset Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "preset_ids"
+      ],
+      "title": "formats_resolveArguments",
+      "type": "object"
+    },
+    "name": "formats_resolve"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Validate typed edits and store an immutable plan/hash. Does not render.",
+    "inputSchema": {
+      "$defs": {
+        "CaptionCue": {
+          "additionalProperties": false,
+          "properties": {
+            "end": {
+              "exclusiveMinimum": 0,
+              "title": "End",
+              "type": "number"
+            },
+            "start": {
+              "minimum": 0,
+              "title": "Start",
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "text"
+          ],
+          "title": "CaptionCue",
+          "type": "object"
+        },
+        "Captions": {
+          "additionalProperties": false,
+          "properties": {
+            "cues": {
+              "items": {
+                "$ref": "#/$defs/CaptionCue"
+              },
+              "maxItems": 5000,
+              "minItems": 1,
+              "title": "Cues",
+              "type": "array"
+            },
+            "style": {
+              "default": "modern",
+              "enum": [
+                "modern",
+                "lower-third"
+              ],
+              "title": "Style",
+              "type": "string"
+            },
+            "type": {
+              "const": "captions",
+              "default": "captions",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cues"
+          ],
+          "title": "Captions",
+          "type": "object"
+        },
+        "Color": {
+          "additionalProperties": false,
+          "properties": {
+            "saturation": {
+              "default": 1,
+              "maximum": 2,
+              "minimum": 0,
+              "title": "Saturation",
+              "type": "number"
+            },
+            "type": {
+              "const": "color",
+              "default": "color",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "title": "Color",
+          "type": "object"
+        },
+        "Crop": {
+          "additionalProperties": false,
+          "properties": {
+            "height": {
+              "minimum": 2,
+              "multipleOf": 2,
+              "title": "Height",
+              "type": "integer"
+            },
+            "type": {
+              "const": "crop",
+              "default": "crop",
+              "title": "Type",
+              "type": "string"
+            },
+            "width": {
+              "minimum": 2,
+              "multipleOf": 2,
+              "title": "Width",
+              "type": "integer"
+            },
+            "x": {
+              "minimum": 0,
+              "multipleOf": 2,
+              "title": "X",
+              "type": "integer"
+            },
+            "y": {
+              "minimum": 0,
+              "multipleOf": 2,
+              "title": "Y",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "title": "Crop",
+          "type": "object"
+        },
+        "Denoise": {
+          "additionalProperties": false,
+          "properties": {
+            "strength": {
+              "default": 2,
+              "maximum": 6,
+              "minimum": 0.1,
+              "title": "Strength",
+              "type": "number"
+            },
+            "type": {
+              "const": "denoise",
+              "default": "denoise",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "title": "Denoise",
+          "type": "object"
+        },
+        "ExportSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "audio": {
+              "default": "copy",
+              "enum": [
+                "copy",
+                "aac",
+                "drop"
+              ],
+              "title": "Audio",
+              "type": "string"
+            },
+            "audio_bitrate_kbps": {
+              "default": 192,
+              "maximum": 320,
+              "minimum": 32,
+              "title": "Audio Bitrate Kbps",
+              "type": "integer"
+            },
+            "container": {
+              "default": "mp4",
+              "enum": [
+                "mp4",
+                "mkv"
+              ],
+              "title": "Container",
+              "type": "string"
+            },
+            "crf": {
+              "default": 18,
+              "maximum": 35,
+              "minimum": 0,
+              "title": "Crf",
+              "type": "integer"
+            },
+            "encoder_preset": {
+              "default": "medium",
+              "enum": [
+                "ultrafast",
+                "fast",
+                "medium",
+                "slow"
+              ],
+              "title": "Encoder Preset",
+              "type": "string"
+            },
+            "fit": {
+              "default": "pad",
+              "enum": [
+                "pad",
+                "crop",
+                "stretch"
+              ],
+              "title": "Fit",
+              "type": "string"
+            },
+            "height": {
+              "anyOf": [
+                {
+                  "maximum": 7680,
+                  "minimum": 2,
+                  "multipleOf": 2,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Height"
+            },
+            "video_codec": {
+              "const": "h264",
+              "default": "h264",
+              "title": "Video Codec",
+              "type": "string"
+            },
+            "width": {
+              "anyOf": [
+                {
+                  "maximum": 7680,
+                  "minimum": 2,
+                  "multipleOf": 2,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Width"
+            }
+          },
+          "title": "ExportSpec",
+          "type": "object"
+        },
+        "Flip": {
+          "additionalProperties": false,
+          "properties": {
+            "axis": {
+              "enum": [
+                "horizontal",
+                "vertical"
+              ],
+              "title": "Axis",
+              "type": "string"
+            },
+            "type": {
+              "const": "flip",
+              "default": "flip",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "axis"
+          ],
+          "title": "Flip",
+          "type": "object"
+        },
+        "Intent": {
+          "additionalProperties": false,
+          "properties": {
+            "allowed_effects": {
+              "items": {
+                "enum": [
+                  "timing",
+                  "geometry",
+                  "lighting",
+                  "color",
+                  "denoise",
+                  "sharpen",
+                  "text",
+                  "format"
+                ],
+                "type": "string"
+              },
+              "title": "Allowed Effects",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "request": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Request",
+              "type": "string"
+            }
+          },
+          "required": [
+            "request",
+            "allowed_effects"
+          ],
+          "title": "Intent",
+          "type": "object"
+        },
+        "Lighting": {
+          "additionalProperties": false,
+          "properties": {
+            "brightness": {
+              "default": 0,
+              "maximum": 0.3,
+              "minimum": -0.3,
+              "title": "Brightness",
+              "type": "number"
+            },
+            "contrast": {
+              "default": 1,
+              "maximum": 1.5,
+              "minimum": 0.5,
+              "title": "Contrast",
+              "type": "number"
+            },
+            "gamma": {
+              "default": 1,
+              "maximum": 2,
+              "minimum": 0.5,
+              "title": "Gamma",
+              "type": "number"
+            },
+            "type": {
+              "const": "lighting",
+              "default": "lighting",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "title": "Lighting",
+          "type": "object"
+        },
+        "PlanRequest": {
+          "additionalProperties": false,
+          "properties": {
+            "asset_id": {
+              "title": "Asset Id",
+              "type": "string"
+            },
+            "export": {
+              "$ref": "#/$defs/ExportSpec"
+            },
+            "intent": {
+              "$ref": "#/$defs/Intent"
+            },
+            "operations": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "captions": "#/$defs/Captions",
+                    "color": "#/$defs/Color",
+                    "crop": "#/$defs/Crop",
+                    "denoise": "#/$defs/Denoise",
+                    "flip": "#/$defs/Flip",
+                    "lighting": "#/$defs/Lighting",
+                    "resize": "#/$defs/Resize",
+                    "rotate": "#/$defs/Rotate",
+                    "sharpen": "#/$defs/Sharpen",
+                    "speed": "#/$defs/Speed",
+                    "title": "#/$defs/Title",
+                    "trim": "#/$defs/Trim"
+                  },
+                  "propertyName": "type"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Trim"
+                  },
+                  {
+                    "$ref": "#/$defs/Resize"
+                  },
+                  {
+                    "$ref": "#/$defs/Crop"
+                  },
+                  {
+                    "$ref": "#/$defs/Rotate"
+                  },
+                  {
+                    "$ref": "#/$defs/Flip"
+                  },
+                  {
+                    "$ref": "#/$defs/Speed"
+                  },
+                  {
+                    "$ref": "#/$defs/Lighting"
+                  },
+                  {
+                    "$ref": "#/$defs/Color"
+                  },
+                  {
+                    "$ref": "#/$defs/Denoise"
+                  },
+                  {
+                    "$ref": "#/$defs/Sharpen"
+                  },
+                  {
+                    "$ref": "#/$defs/Title"
+                  },
+                  {
+                    "$ref": "#/$defs/Captions"
+                  }
+                ]
+              },
+              "maxItems": 100,
+              "title": "Operations",
+              "type": "array"
+            },
+            "project_id": {
+              "title": "Project Id",
+              "type": "string"
+            },
+            "revision": {
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            },
+            "schema_version": {
+              "const": "1",
+              "default": "1",
+              "title": "Schema Version",
+              "type": "string"
+            }
+          },
+          "required": [
+            "project_id",
+            "revision",
+            "asset_id",
+            "intent"
+          ],
+          "title": "PlanRequest",
+          "type": "object"
+        },
+        "Resize": {
+          "additionalProperties": false,
+          "properties": {
+            "fit": {
+              "default": "pad",
+              "enum": [
+                "pad",
+                "crop",
+                "stretch"
+              ],
+              "title": "Fit",
+              "type": "string"
+            },
+            "height": {
+              "maximum": 7680,
+              "minimum": 2,
+              "multipleOf": 2,
+              "title": "Height",
+              "type": "integer"
+            },
+            "type": {
+              "const": "resize",
+              "default": "resize",
+              "title": "Type",
+              "type": "string"
+            },
+            "width": {
+              "maximum": 7680,
+              "minimum": 2,
+              "multipleOf": 2,
+              "title": "Width",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "width",
+            "height"
+          ],
+          "title": "Resize",
+          "type": "object"
+        },
+        "Rotate": {
+          "additionalProperties": false,
+          "properties": {
+            "degrees": {
+              "enum": [
+                90,
+                180,
+                270
+              ],
+              "title": "Degrees",
+              "type": "integer"
+            },
+            "type": {
+              "const": "rotate",
+              "default": "rotate",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "degrees"
+          ],
+          "title": "Rotate",
+          "type": "object"
+        },
+        "Sharpen": {
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "default": 0.5,
+              "maximum": 1.5,
+              "minimum": 0.1,
+              "title": "Amount",
+              "type": "number"
+            },
+            "type": {
+              "const": "sharpen",
+              "default": "sharpen",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "title": "Sharpen",
+          "type": "object"
+        },
+        "Speed": {
+          "additionalProperties": false,
+          "properties": {
+            "factor": {
+              "maximum": 4,
+              "minimum": 0.25,
+              "title": "Factor",
+              "type": "number"
+            },
+            "type": {
+              "const": "speed",
+              "default": "speed",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "factor"
+          ],
+          "title": "Speed",
+          "type": "object"
+        },
+        "Title": {
+          "additionalProperties": false,
+          "properties": {
+            "animated": {
+              "default": false,
+              "title": "Animated",
+              "type": "boolean"
+            },
+            "end": {
+              "exclusiveMinimum": 0,
+              "title": "End",
+              "type": "number"
+            },
+            "start": {
+              "minimum": 0,
+              "title": "Start",
+              "type": "number"
+            },
+            "style": {
+              "default": "modern",
+              "enum": [
+                "modern",
+                "lower-third"
+              ],
+              "title": "Style",
+              "type": "string"
+            },
+            "text": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            },
+            "type": {
+              "const": "title",
+              "default": "title",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "text",
+            "start",
+            "end"
+          ],
+          "title": "Title",
+          "type": "object"
+        },
+        "Trim": {
+          "additionalProperties": false,
+          "properties": {
+            "end": {
+              "exclusiveMinimum": 0,
+              "title": "End",
+              "type": "number"
+            },
+            "start": {
+              "minimum": 0,
+              "title": "Start",
+              "type": "number"
+            },
+            "type": {
+              "const": "trim",
+              "default": "trim",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ],
+          "title": "Trim",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "request": {
+          "$ref": "#/$defs/PlanRequest"
+        }
+      },
+      "required": [
+        "request"
+      ],
+      "title": "plans_createArguments",
+      "type": "object"
+    },
+    "name": "plans_create"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Recheck exact plan hash, constraints and engine availability before execution.",
+    "inputSchema": {
+      "properties": {
+        "plan_hash": {
+          "title": "Plan Hash",
+          "type": "string"
+        },
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id",
+        "plan_hash"
+      ],
+      "title": "plans_validateArguments",
+      "type": "object"
+    },
+    "name": "plans_validate"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Queue an exact validated plan. Returns a job, not a completed video.",
+    "inputSchema": {
+      "properties": {
+        "idempotency_key": {
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "plan_hash": {
+          "title": "Plan Hash",
+          "type": "string"
+        },
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id",
+        "plan_hash",
+        "idempotency_key"
+      ],
+      "title": "render_submitArguments",
+      "type": "object"
+    },
+    "name": "render_submit"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Read job state and receipts. Only succeeded indicates a validated completed output.",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "title": "jobs_getArguments",
+      "type": "object"
+    },
+    "name": "jobs_get"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Request cancellation; running jobs stop when the worker observes the request.",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "title": "jobs_cancelArguments",
+      "type": "object"
+    },
+    "name": "jobs_cancel"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Retry failed/cancelled work using a new key; revalidates rendering plans.",
+    "inputSchema": {
+      "properties": {
+        "idempotency_key": {
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "idempotency_key"
+      ],
+      "title": "jobs_retryArguments",
+      "type": "object"
+    },
+    "name": "jobs_retry"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Return a successful local artifact path, hash, size and validation evidence.",
+    "inputSchema": {
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id"
+      ],
+      "title": "artifacts_getArguments",
+      "type": "object"
+    },
+    "name": "artifacts_get"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "description": "Queue optional local faster-whisper ASR; requires installed model files and package.",
+    "inputSchema": {
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        }
+      },
+      "required": [
+        "asset_id",
+        "idempotency_key"
+      ],
+      "title": "transcripts_createArguments",
+      "type": "object"
+    },
+    "name": "transcripts_create"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Read a completed transcript with estimated timing provenance.",
+    "inputSchema": {
+      "properties": {
+        "transcript_id": {
+          "title": "Transcript Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "transcript_id"
+      ],
+      "title": "transcripts_getArguments",
+      "type": "object"
+    },
+    "name": "transcripts_get"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Serialize supplied caption text/times to SRT or WebVTT; does not invent transcription.",
+    "inputSchema": {
+      "$defs": {
+        "CaptionCue": {
+          "additionalProperties": false,
+          "properties": {
+            "end": {
+              "exclusiveMinimum": 0,
+              "title": "End",
+              "type": "number"
+            },
+            "start": {
+              "minimum": 0,
+              "title": "Start",
+              "type": "number"
+            },
+            "text": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "text"
+          ],
+          "title": "CaptionCue",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "cues": {
+          "items": {
+            "$ref": "#/$defs/CaptionCue"
+          },
+          "title": "Cues",
+          "type": "array"
+        },
+        "format_name": {
+          "enum": [
+            "srt",
+            "vtt"
+          ],
+          "title": "Format Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cues",
+        "format_name"
+      ],
+      "title": "subtitles_exportArguments",
+      "type": "object"
+    },
+    "name": "subtitles_export"
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "description": "Report design-provider readiness; no credentials or tokens are returned.",
+    "inputSchema": {
+      "properties": {},
+      "title": "connections_statusArguments",
+      "type": "object"
+    },
+    "name": "connections_status"
+  },
+  {
+    "annotations": {
+      "destructiveHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    },
+    "description": "Design-provider boundary. Canva returns an actionable unavailable error.",
+    "inputSchema": {
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "action",
+        "arguments"
+      ],
+      "title": "designs_executeArguments",
+      "type": "object"
+    },
+    "name": "designs_execute"
+  }
+]

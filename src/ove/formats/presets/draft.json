@@ -1,0 +1,10 @@
+{
+  "id": "draft",
+  "version": 1,
+  "status": "advisory",
+  "description": "draft",
+  "settings": {
+    "crf": 28,
+    "encoder_preset": "ultrafast"
+  }
+}

@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "open-video-editing"
+version = "0.1.0"
+description = "Non-destructive local video editing with typed plans and MCP tools"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+dependencies = [
+    "cryptography>=46.0.7,<47 ; platform_machine == 'x86_64' and sys_platform == 'darwin'",
+    "mcp>=1.20,<2",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.7,<3",
+]
+
+[project.optional-dependencies]
+transcription = ["faster-whisper>=1.1,<2"]
+
+[project.scripts]
+ove = "ove.cli.main:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9", "pytest-asyncio>=0.25,<2", "ruff>=0.11,<1", "mypy>=1.15,<2", "build>=1.2,<2", "pyyaml>=6,<7"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ove"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/ove"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["media: requires ffmpeg and ffprobe"]
