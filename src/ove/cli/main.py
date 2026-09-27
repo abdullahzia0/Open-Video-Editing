@@ -13,7 +13,7 @@ from pydantic import ValidationError
 from ove.application.bootstrap import build_service
 from ove.application.worker import Worker
 from ove.domain.errors import OveError
-from ove.domain.models import PlanRequest
+from ove.domain.models import MediaJobRequest, PlanRequest
 
 
 def parser() -> argparse.ArgumentParser:
@@ -34,8 +34,17 @@ def parser() -> argparse.ArgumentParser:
     render.add_argument("--key", required=True)
     job = sub.add_parser("job", help="Read persisted job state")
     job.add_argument("job_id")
+    jobs = sub.add_parser("jobs", help="List queued and historical jobs")
+    jobs.add_argument("--state", default=None)
+    jobs.add_argument("--limit", type=int, default=20)
     cancel = sub.add_parser("cancel", help="Cancel a queued/running job")
     cancel.add_argument("job_id")
+    retry = sub.add_parser("retry", help="Re-queue a failed or cancelled job")
+    retry.add_argument("job_id")
+    retry.add_argument("--key", required=True)
+    inspect = sub.add_parser("info", help="Probe an asset id or an allowlisted local path")
+    inspect.add_argument("source")
+    inspect.add_argument("--path", action="store_true", help="Treat source as a filesystem path")
     worker = sub.add_parser("worker", help="Process durable jobs with an exclusive local worker")
     worker.add_argument("--once", action="store_true", help="Process at most one queued job")
     artifact = sub.add_parser(
@@ -50,6 +59,14 @@ def parser() -> argparse.ArgumentParser:
     return root
 
 
+def _plan_from_file(path: Path) -> PlanRequest | MediaJobRequest:
+    """Accept either a single-source render plan or a multi-input job request."""
+    document = json.loads(path.read_text())
+    if "job" in document:
+        return MediaJobRequest.model_validate(document)
+    return PlanRequest.model_validate(document)
+
+
 def main() -> None:
     args = parser().parse_args()
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
@@ -62,17 +79,28 @@ def main() -> None:
             case "formats":
                 value = service.presets.catalog()
             case "import":
-                value = service.import_asset(args.source)
+                value = service.asset_info(service.import_asset(args.source)["id"])
             case "project":
                 value = service.create_project(args.name, args.asset_ids)
             case "plan":
-                value = service.create_plan(PlanRequest.model_validate_json(args.file.read_text()))
+                request = _plan_from_file(args.file)
+                value = (
+                    service.create_plan(request)
+                    if isinstance(request, PlanRequest)
+                    else service.create_media_plan(request)
+                )
             case "render":
-                value = service.submit_render(args.plan_id, args.plan_hash, args.key)
+                value = service.submit_plan(args.plan_id, args.plan_hash, args.key)
             case "job":
-                value = service.repository.job(args.job_id)
+                value = service.job_status(args.job_id)
+            case "jobs":
+                value = service.list_jobs(args.state, args.limit)
             case "cancel":
-                value = service.repository.cancel(args.job_id)
+                value = service.cancel_job(args.job_id)
+            case "retry":
+                value = service.retry(args.job_id, args.key)
+            case "info":
+                value = service.media_info(args.source, args.path)
             case "worker":
                 Worker(service).run(once=args.once)
                 return
@@ -91,13 +119,13 @@ def main() -> None:
 
                 create_server(service).run(transport=args.transport)
                 return
-        print(json.dumps(value, indent=2))
+        print(json.dumps(value, indent=2, default=str))
     except (OveError, ValidationError, OSError, ValueError) as exc:
         error = (
             exc.as_dict()
             if isinstance(exc, OveError)
             else {
-                "code": "invalid_input_or_environment",
+                "code": "INVALID_INPUT",
                 "message": str(exc),
                 "retryable": False,
             }

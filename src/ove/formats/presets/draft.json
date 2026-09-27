@@ -1,10 +1,11 @@
 {
+  "category": "quality",
+  "description": "Draft profile",
   "id": "draft",
-  "version": 1,
-  "status": "advisory",
-  "description": "draft",
   "settings": {
     "crf": 28,
     "encoder_preset": "ultrafast"
-  }
+  },
+  "status": "advisory",
+  "version": 1
 }

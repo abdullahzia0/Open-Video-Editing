@@ -1,5 +1,6 @@
 """Transactional local metadata and job queue. One worker owns rendering at a time."""
 
+import json
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -8,6 +9,11 @@ from typing import Any
 
 from ove.domain.errors import OveError
 from ove.utilities.identity import canonical, new_id, now
+
+#: Object kinds whose records may be enumerated. Prevents an accidental full scan
+#: of unrelated tables and keeps the JSON path expression bounded to known fields.
+LISTABLE_KINDS = {"asset", "project", "revision", "plan", "artifact", "transcript"}
+SEARCHABLE_FIELDS = {"job_id", "asset_id", "project_id", "kind"}
 
 
 class SQLiteRepository:
@@ -51,8 +57,6 @@ class SQLiteRepository:
                 raise OveError("conflict", "Immutable object already exists.") from exc
 
     def get(self, kind: str, object_id: str) -> dict[str, Any]:
-        import json
-
         with self.connection() as db:
             row = db.execute(
                 "SELECT body FROM objects WHERE kind=? AND id=?", (kind, object_id)
@@ -62,11 +66,32 @@ class SQLiteRepository:
         result: dict[str, Any] = json.loads(row["body"])
         return result
 
-    def revise_project(
-        self, project_id: str, expected: int, asset_ids: list[str]
-    ) -> dict[str, Any]:
-        import json
+    def list_objects(self, kind: str, limit: int = 50, offset: int = 0) -> list[dict[str, Any]]:
+        if kind not in LISTABLE_KINDS:
+            raise OveError("invalid_request", "This record kind cannot be listed.")
+        with self.connection() as db:
+            rows = db.execute(
+                "SELECT body FROM objects WHERE kind=? ORDER BY rowid DESC LIMIT ? OFFSET ?",
+                (kind, limit, offset),
+            ).fetchall()
+        return [json.loads(row["body"]) for row in rows]
 
+    def find_objects(
+        self, kind: str, field: str, value: str, limit: int = 50
+    ) -> list[dict[str, Any]]:
+        if kind not in LISTABLE_KINDS or field not in SEARCHABLE_FIELDS:
+            raise OveError("invalid_request", "This record query is not supported.")
+        with self.connection() as db:
+            rows = db.execute(
+                "SELECT body FROM objects WHERE kind=? AND json_extract(body, '$.' || ?) = ? "
+                "ORDER BY rowid LIMIT ?",
+                (kind, field, value, limit),
+            ).fetchall()
+        return [json.loads(row["body"]) for row in rows]
+
+    def revise_project(
+        self, project_id: str, expected: int, changes: dict[str, Any]
+    ) -> dict[str, Any]:
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute(
@@ -77,7 +102,7 @@ class SQLiteRepository:
             project: dict[str, Any] = json.loads(row["body"])
             if project["revision"] != expected:
                 raise OveError("revision_conflict", "Project changed; fetch the latest revision.")
-            project = {**project, "revision": expected + 1, "asset_ids": asset_ids}
+            project = {**project, **changes, "revision": expected + 1}
             db.execute(
                 "INSERT INTO objects VALUES ('revision',?,?)",
                 (f"{project_id}:{expected + 1}", canonical(project)),
@@ -92,13 +117,17 @@ class SQLiteRepository:
         self, kind: str, payload: dict[str, Any], key: str, fingerprint: str
     ) -> dict[str, Any]:
         if not key or len(key) > 200:
-            raise OveError("invalid_idempotency_key", "Use an idempotency key of 1–200 characters.")
+            raise OveError("invalid_idempotency_key", "Use an idempotency key of 1-200 characters.")
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             existing = db.execute("SELECT * FROM jobs WHERE idempotency_key=?", (key,)).fetchone()
             if existing:
                 if existing["fingerprint"] != fingerprint or existing["kind"] != kind:
-                    raise OveError("idempotency_conflict", "Key was used for different work.")
+                    raise OveError(
+                        "idempotency_conflict",
+                        "This idempotency key was already used for different work.",
+                        "Reuse the original arguments, or pass a new idempotency_key.",
+                    )
                 return self._job(existing)
             job_id = new_id("job")
             timestamp = now()
@@ -110,8 +139,6 @@ class SQLiteRepository:
 
     @staticmethod
     def _job(row: sqlite3.Row) -> dict[str, Any]:
-        import json
-
         result = dict(row)
         for field in ("payload", "result", "error"):
             result[field] = json.loads(result[field]) if result[field] else None
